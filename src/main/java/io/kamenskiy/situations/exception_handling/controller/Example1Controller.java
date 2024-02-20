@@ -22,7 +22,7 @@ public class Example1Controller {
      * Метод для обработки ошибок.
      */
     @ExceptionHandler(BusinessException.class)
-    @ResponseStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleException(BusinessException ex){
         return new Response(ex.getMessage());
     }
