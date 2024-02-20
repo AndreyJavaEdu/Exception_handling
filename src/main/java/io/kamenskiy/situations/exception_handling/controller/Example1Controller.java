@@ -3,10 +3,9 @@ package io.kamenskiy.situations.exception_handling.controller;
 import io.kamenskiy.situations.exception_handling.dto.Response;
 import io.kamenskiy.situations.exception_handling.exception.BusinessException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class Example1Controller {
@@ -19,5 +18,12 @@ public class Example1Controller {
         return new Response("Ok");
     }
 
-
+    /**
+     * Метод для обработки ошибок.
+     */
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+    public Response handleException(BusinessException ex){
+        return new Response(ex.getMessage());
+    }
 }
