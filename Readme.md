@@ -392,7 +392,7 @@ public class Example5Controller {
 }
 ```
 Для наглядности демонстрации мы изменили в методе сообщение об ошибке, стали добавлять к нему дату:
-![Демонстрация CustomAdvice.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FCustomAdvice%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20CustomAdvice.png)
+![Демонстрация CustomAdvice.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/Readme/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/ControllerAdvice/%40ControllerAdvice.png)
 
 
 ### Исключение ResponseStatusException.
@@ -429,4 +429,4 @@ public class Example6Controller {
 Но тут возвращаемся к проблеме отсутствия тела сообщения, но в простых случаях такой подход 
 может быть удобен.
 
-![Демонстрация выброса исключения ResponseStatusException.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FResponseStatusException%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%E2%FB%E1%F0%EE%F1%E0%20%E8%F1%EA%EB%FE%F7%E5%ED%E8%FF%20ResponseStatusException.png)
+![Демонстрация выброса исключения ResponseStatusException.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/Readme/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/ResponseStatusException/%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D0%B2%D1%8B%D0%B1%D1%80%D0%BE%D1%81%D0%B0%20%D0%B8%D1%81%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%20ResponseStatusException.png)
