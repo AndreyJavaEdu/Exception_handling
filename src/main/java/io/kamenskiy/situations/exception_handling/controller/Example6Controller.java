@@ -13,8 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class Example6Controller {
 
     @GetMapping(value = "/testResponseStatusException", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Response testResponseStatusException(@RequestParam(required = false, defaultValue = "false") boolean exception)
-        throws BusinessException{
+    public Response testResponseStatusException(@RequestParam(required = false, defaultValue = "false") boolean exception) {
         if (exception){
             throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "ResponseStatusException in testResponseStatusException");
         }
