@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ServiceException extends Exception{
     public ServiceException() {
     }
-
     public ServiceException(String message) {
         super(message);
     }
