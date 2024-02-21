@@ -172,7 +172,96 @@ public class Example2Controller {
 ```
 Если отправить GET-запрос и передать параметр exception=true, то приложение в ответ вернёт 500-ю ошибку:
 
-![@ResponseStatus.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FResponseStatusExceptionResolver%2F%40ResponseStatus.png)
+![@ResponseStatus.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/Readme/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/ResponseStatusExceptionResolver/%40ResponseStatus.png)
 
 Из недостатков такого подхода — как и в предыдущем случае отсутствует тело ответа. 
 Но если нужно вернуть только код статуса, то @ResponseStatus довольно удобная штука.
+
+<span style="color:#92d050">Кастомный HandlerExceptionResolver</span> позволит решить проблему 
+из предыдущих примеров, наконец-то можно вернуть клиенту красивый JSON или XML с необходимой 
+информацией. Но он сложный по реализации и используется старый класс для модели ModelAndView.
+
+В качестве примера я сделал кастомный класс резолвер [ExceptionHandlingApplication.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2FExceptionHandlingApplication.java):
+```java
+package io.kamenskiy.situations.exception_handling.resolver;
+
+import io.kamenskiy.situations.exception_handling.exception.CustomException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+@Component
+@Slf4j
+public class CustomHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
+    @Override
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        // объект модели ModelAndView будет использовать `MappingJackson2JsonView` для отображения модели данных в формате JSON.
+        ModelAndView modelAndView = new ModelAndView(new MappingJackson2JsonView());
+        if (ex instanceof CustomException){
+            modelAndView.setStatus(HttpStatus.BAD_REQUEST);
+            modelAndView.addObject("message", "CustomException was handled");
+            logger.error(ex.getMessage());
+            return modelAndView;
+        }
+        modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        modelAndView.addObject("message", "Another Exception was handled");
+        return modelAndView;
+    }
+}
+```
+Также создал свое исключение [CustomException.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fexception%2FCustomException.java):
+```java
+package io.kamenskiy.situations.exception_handling.exception;
+
+public class CustomException extends Exception{
+    public CustomException() {
+    }
+
+    public CustomException(String message) {
+        super(message);
+    }
+}
+```
+А также реализовали контроллер [Example3Controller.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fcontroller%2FExample3Controller.java) для проверки кастомного резолвера:
+```java
+package io.kamenskiy.situations.exception_handling.controller;
+
+import io.kamenskiy.situations.exception_handling.dto.Response;
+import io.kamenskiy.situations.exception_handling.exception.CustomException;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class Example3Controller {
+    @GetMapping(value = "/testCustomExceptionResolver", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Response testCustomHandlerExceptionResolver(@RequestParam(required = false, defaultValue = "false") boolean exception)
+        throws CustomException {
+        if(exception){
+            throw new CustomException("CustomException in testCustomHandlerExceptionResolver");
+        }
+        return new Response("Ok");
+    }
+}
+```
+Приходится выполнять всю работу руками: сами проверяем тип исключения, и сами формируем объект 
+древнего класса ModelAndView. На выходе конечно получим красивый JSON, 
+но в коде красоты явно не хватает.
+
+Такой резолвер может глобально перехватывать и обрабатывать любые типы исключений и 
+возвращать как статус-код, так и тело ответа. Формально он даёт нам много возможностей и 
+не имеет недостатков из предыдущих примеров.
+
+Демонстрация вызова:
+
+![Демонстрация вызова.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2F%CA%E0%F1%F2%EE%EC%ED%FB%E9%20%F0%E5%E7%EE%EB%E2%E5%F0%20CustomHandlerExceptionResolver%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%E2%FB%E7%EE%E2%E0.png)
+
+Видим что исключение прекрасно обработалось и в ответ получили код 400 и 
+JSON с сообщением об ошибке.
+
+
