@@ -86,8 +86,8 @@ public class BusinessException extends Exception{
 
 Демонстрация работы контроллера при обработке ошибки:
 
-![Пример работы с ошибкой.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2F%40ExceptionHandler%2F%CF%F0%E8%EC%E5%F0%20%F0%E0%E1%EE%F2%FB%20%F1%20%EE%F8%E8%E1%EA%EE%E9.png)
+![Пример работы с ошибкой.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/master/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/%40ExceptionHandler/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20%D1%81%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%BE%D0%B9.png)
 
 Демонстрация штатной работы без, когда исключение не выбрасывается:
 
-![Демонстрация штатной работы.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2F%40ExceptionHandler%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F8%F2%E0%F2%ED%EE%E9%20%F0%E0%E1%EE%F2%FB.png)
+![Демонстрация штатной работы.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/master/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/%40ExceptionHandler/%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%88%D1%82%D0%B0%D1%82%D0%BD%D0%BE%D0%B9%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B.png)
