@@ -259,9 +259,74 @@ public class Example3Controller {
 
 Демонстрация вызова:
 
-![Демонстрация вызова.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2F%CA%E0%F1%F2%EE%EC%ED%FB%E9%20%F0%E5%E7%EE%EB%E2%E5%F0%20CustomHandlerExceptionResolver%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%E2%FB%E7%EE%E2%E0.png)
+![Демонстрация вызова.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/Readme/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/%D0%9A%D0%B0%D1%81%D1%82%D0%BE%D0%BC%D0%BD%D1%8B%D0%B9%20%D1%80%D0%B5%D0%B7%D0%BE%D0%BB%D0%B2%D0%B5%D1%80%20CustomHandlerExceptionResolver/%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D0%B2%D1%8B%D0%B7%D0%BE%D0%B2%D0%B0.png)
 
 Видим что исключение прекрасно обработалось и в ответ получили код 400 и 
 JSON с сообщением об ошибке.
 
+### Обработка исключений с помощью @ControllerAdvice
+Начиная со Spring 3.2 можно глобально и централизованно обрабатывать исключения с помощью классов 
+с аннотацией @ControllerAdvice.
 
+Для примера реализовали класс эдвайса - [DefaultAdvice.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fadvice%2FDefaultAdvice.java):
+```java
+package io.kamenskiy.situations.exception_handling.advice;
+
+import io.kamenskiy.situations.exception_handling.dto.Response;
+import io.kamenskiy.situations.exception_handling.exception.BusinessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+@ControllerAdvice
+public class DefaultAdvice {
+@ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Response> handleException(BusinessException ex){
+        Response response = new Response(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+}
+```
+Итак мы создали в пакете advice класс DefaultAdvice, который проаннотировали аннотацией @ControllerAdvice.
+Любой класс с аннотацией @ControllerAdvice будет являться глобальным обработчиком исключений, 
+который очень гибко настраивается. В нашем случае мы создали класс DefaultAdvice с одним
+единственным методом handleException(). Метод handleException() имеет аннотацию @ExceptionHandler,
+в которой, можно определить список обрабатываемых исключений. 
+В нашем случае будем перехватывать все исключения [BusinessException.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fexception%2FBusinessException.java).
+
+Можно одним методом обрабатывать и несколько исключений сразу: 
+@ExceptionHandler({BusinessException.class, ServiceException.class}). Так же можно в рамках эдвайса
+сделать сразу несколько методов с аннотациями @ExceptionHandler для обработки разных исключений.  
+Важное замечание, что метод handleException() возвращает объект ResponseEntity с нашим 
+собственным типом Response (этот класс мы ранее реализовывали в пакете[dto](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fdto)).
+
+Для проверки работы эдвайса я сделал простой контроллер:
+```java
+package io.kamenskiy.situations.exception_handling.controller;
+
+import io.kamenskiy.situations.exception_handling.annotation.CustomExceptionHandler;
+import io.kamenskiy.situations.exception_handling.dto.Response;
+import io.kamenskiy.situations.exception_handling.exception.BusinessException;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CustomExceptionHandler
+public class Example5Controller {
+
+    @GetMapping(value = "/testCustomAdvice", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Response testCustomControllerAdvice(@RequestParam(required = false, defaultValue = "false") boolean exception)
+            throws BusinessException{
+        if (exception){
+            throw new BusinessException("Была выброшена ошибка BusinessException в методе testCustomControllerAdvice");
+        }
+        return new Response("Все ОК");
+    }
+}
+```
+В результате, получаем красивый JSON в ответе пользователю и код 400:
+
+![@ControllerAdvice.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FControllerAdvice%2F%40ControllerAdvice.png)
