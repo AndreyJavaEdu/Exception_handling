@@ -1,7 +1,6 @@
 package io.kamenskiy.situations.exception_handling.controller;
 
 import io.kamenskiy.situations.exception_handling.dto.Response;
-import io.kamenskiy.situations.exception_handling.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class Example6Controller {
 
     @GetMapping(value = "/testResponseStatusException", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Response testResponseStatusException(@RequestParam(required = false, defaultValue = "false") boolean exception)
-        throws BusinessException{
+    public Response testResponseStatusException(@RequestParam(required = false, defaultValue = "false") boolean exception) {
         if (exception){
             throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "ResponseStatusException in testResponseStatusException");
         }
