@@ -329,4 +329,104 @@ public class Example5Controller {
 ```
 В результате, получаем красивый JSON в ответе пользователю и код 400:
 
-![@ControllerAdvice.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FControllerAdvice%2F%40ControllerAdvice.png)
+![@ControllerAdvice.png](https://github.com/AndreyJavaEdu/Exception_handling/blob/Readme/%D0%A1%D1%85%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20Postman/ControllerAdvice/%40ControllerAdvice.png)
+
+
+Если мы хотим обрабатывать исключения только от определенных контроллеров, то можно воспользоваться кастомной аннотацией.
+
+Создали кастомный класс [CustomControllerAdvice.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fadvice%2FCustomControllerAdvice.java):
+```java
+package io.kamenskiy.situations.exception_handling.advice;
+
+import io.kamenskiy.situations.exception_handling.annotation.CustomExceptionHandler;
+import io.kamenskiy.situations.exception_handling.dto.Response;
+import io.kamenskiy.situations.exception_handling.exception.BusinessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.LocalDateTime;
+
+@ControllerAdvice(annotations = CustomExceptionHandler.class)
+public class CustomControllerAdvice {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Response> handlerException(BusinessException ex){
+        String message = String.format("%s %s", LocalDateTime.now(), ex.getMessage());
+        Response response = new Response(message);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+}
+```
+Также создали аннотацию @CustomExceptionHandler - [CustomExceptionHandler.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fannotation%2FCustomExceptionHandler.java) в пакете [annotation](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fannotation):
+```java
+package io.kamenskiy.situations.exception_handling.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CustomExceptionHandler {
+}
+```
+В параметре аннотации @ControllerAdvice добавили атрибут annotations и присвоили ей нашу аннотацию.
+Такая запись означает что CustomAdvice будет обрабатывать исключения только от тех контроллеров,
+которые дополнительно имеют аннотацию @CustomExceptionHandler.
+Исходный код контроллера - [Example6Controller.java](src%2Fmain%2Fjava%2Fio%2Fkamenskiy%2Fsituations%2Fexception_handling%2Fcontroller%2FExample6Controller.java):
+```java
+@RestController  
+@CustomExceptionHandler  
+public class Example5Controller {  
+  
+    @GetMapping(value = "/testCustomAdvice", produces = MediaType.APPLICATION_JSON_VALUE)  
+    public Response testCustomControllerAdvice(@RequestParam(required = false, defaultValue = "false") boolean exception)  
+        throws BusinessException{  
+        if (exception){  
+            throw new BusinessException("Была выброшена ошибка BusinessException в методе testCustomControllerAdvice");  
+        }  
+        return new Response("Все ОК");  
+    }  
+}
+```
+Для наглядности демонстрации мы изменили в методе сообщение об ошибке, стали добавлять к нему дату:
+![Демонстрация CustomAdvice.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FCustomAdvice%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20CustomAdvice.png)
+
+
+### Исключение ResponseStatusException.
+Можно формировать ответ, путём выброса исключения ResponseStatusException:
+```java
+package io.kamenskiy.situations.exception_handling.controller;  
+  
+import io.kamenskiy.situations.exception_handling.dto.Response;  
+import io.kamenskiy.situations.exception_handling.exception.BusinessException;  
+import org.springframework.http.HttpStatus;  
+import org.springframework.http.MediaType;  
+import org.springframework.web.bind.annotation.GetMapping;  
+import org.springframework.web.bind.annotation.RequestParam;  
+import org.springframework.web.bind.annotation.RestController;  
+import org.springframework.web.server.ResponseStatusException;  
+  
+@RestController  
+public class Example6Controller {  
+  
+    @GetMapping(value = "/testResponseStatusException", produces = MediaType.APPLICATION_JSON_VALUE)  
+    public Response testResponseStatusException(@RequestParam(required = false, defaultValue = "false") boolean exception)  
+        throws BusinessException{  
+        if (exception){  
+            throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "ResponseStatusException in testResponseStatusException");  
+        }  
+        return new Response("Все ОК!!!");  
+    }  
+}
+```
+Выбрасывая ResponseStatusException можно также возвращать пользователю определённый код статуса, 
+в зависимости от того, что произошло в логике приложения. При этом не нужно создавать кастомное 
+исключение и прописывать аннотацию @ResponseStatus — просто выбрасываем исключение и передаём 
+нужный статус-код.
+Но тут возвращаемся к проблеме отсутствия тела сообщения, но в простых случаях такой подход 
+может быть удобен.
+
+![Демонстрация выброса исключения ResponseStatusException.png](%D1%F5%E5%EC%FB%20%E8%20%E4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%F0%E0%E1%EE%F2%FB%20Postman%2FResponseStatusException%2F%C4%E5%EC%EE%ED%F1%F2%F0%E0%F6%E8%FF%20%E2%FB%E1%F0%EE%F1%E0%20%E8%F1%EA%EB%FE%F7%E5%ED%E8%FF%20ResponseStatusException.png)
